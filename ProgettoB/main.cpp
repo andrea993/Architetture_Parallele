@@ -91,6 +91,8 @@ int main(int argc, char **argv)
 
 	for_each (colors.begin(), colors.end(), 
 			[](COLORTRIPLE& x){x=newColor(rand()%256,rand()%256,rand()%256);});
+	
+	vector<pthread_t> threads(N);
 
 	clock_t t_begin=clock();
 
@@ -100,10 +102,11 @@ int main(int argc, char **argv)
 		int i1=(i+1)*height/N;    
 		ThreadData d(i0,i1,mtx,colors);
 
-		pthread_t thread_i;
-		pthread_create(&thread_i,NULL,parLoop,static_cast<void*>(&d));
-		pthread_join(thread_i, NULL);
+		pthread_create(&threads[i],NULL,parLoop,static_cast<void*>(&d));
 	}
+	
+	for_each(threads.begin(), threads.end(),
+			[](pthread_t x){pthread_join(x,NULL);});
 
 	clock_t t_end=clock();
 	cout << "Elapsed time: " << double(t_end-t_begin)/CLOCKS_PER_SEC << endl;	
