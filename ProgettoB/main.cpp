@@ -72,6 +72,7 @@ void* parLoop(void *arg)
 			PIXEL(data->mtx,i,j)=data->colors[itr];
 		}
 
+	delete data;
 	pthread_exit(NULL);
 	return (void*)0;
 }
@@ -104,10 +105,11 @@ int main(int argc, char **argv)
 	for(int i=0; i<N; i++)
 	{
 		int i0=i*height/N;
-		int i1=(i+1)*height/N;    
-		ThreadData d(i0,i1,mtx,colors);
+		int i1=(i+1)*height/N;
 
-		pthread_create(&threads[i],NULL,parLoop,static_cast<void*>(&d));
+		ThreadData *d_ptr=new ThreadData(i0,i1,mtx,colors);
+
+		pthread_create(&threads[i],NULL,parLoop,static_cast<void*>(d_ptr));
 	}
 
 	for_each(threads.begin(), threads.end(),
