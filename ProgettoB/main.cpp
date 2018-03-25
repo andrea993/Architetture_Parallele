@@ -21,15 +21,25 @@ const double My=1;
 
 const int maxiter=1024;
 
+struct RandomColor : COLORTRIPLE
+{
+	RandomColor()
+	{
+			blue=static_cast<byte>(rand()%256);
+			green=static_cast<byte>(rand()%256);
+			red=static_cast<byte>(rand()%256);
+	}
+};
+
 struct ThreadData
 {
-	ThreadData(int idx0, int idx1, BITMAP &mtx, const vector<COLORTRIPLE> &colors): 
+	ThreadData(int idx0, int idx1, BITMAP &mtx, const vector<RandomColor> &colors): 
 		idx0(idx0), idx1(idx1), mtx(mtx), colors(colors) {}
 
 	const int idx0;
 	const int idx1;
 	BITMAP &mtx;
-	const vector<COLORTRIPLE> &colors;
+	const vector<RandomColor> &colors;
 };
 
 inline double nowSec()
@@ -93,11 +103,8 @@ int main(int argc, char **argv)
 
 	int N=stoi(argv[2]);
 
-	vector<COLORTRIPLE> colors(maxiter);
+	vector<RandomColor> colors(maxiter);
 	BITMAP mtx=CreateEmptyBitmap(height,width);
-
-	for_each (colors.begin(), colors.end(), 
-			[](COLORTRIPLE& x){x=newColor(rand()%256,rand()%256,rand()%256);});
 
 	vector<pthread_t> threads(N);
 
@@ -116,7 +123,7 @@ int main(int argc, char **argv)
 			[](pthread_t x){pthread_join(x,NULL);});
 
 	double t_end=nowSec();
-	cout << "Elapsed time: " << t_end-t_begin  << endl;	
+	cout << "Elapsed time: " << t_end-t_begin  << "sec" << endl;	
 
 	FILE* fp=fopen("out.bmp","wb");
 	WriteBitmap(mtx,fp);

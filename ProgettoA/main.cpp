@@ -4,11 +4,11 @@
 #include <algorithm>
 #include <cstdio>
 #include <string>
-#include <ctime>
 
 extern "C"
 {
 #include "bmp.h"
+#include <sys/time.h>
 }
 
 using namespace std;
@@ -17,6 +17,26 @@ const double mx=-2.5;
 const double Mx=1;
 const double my=-1;
 const double My=1;
+
+const int maxiter=1024;
+
+struct RandomColor : COLORTRIPLE
+{
+	RandomColor()
+	{
+			blue=static_cast<byte>(rand()%256);
+			green=static_cast<byte>(rand()%256);
+			red=static_cast<byte>(rand()%256);
+	}
+};
+
+inline double nowSec()
+{
+	struct timeval t;
+	struct timezone tzp;
+	gettimeofday(&t, &tzp);
+	return t.tv_sec + t.tv_usec*1e-6;
+}
 
 inline COLORTRIPLE newColor(byte r, byte g, byte b)
 {
@@ -44,16 +64,12 @@ int main(int argc, char **argv)
 	int width=stoi(argv[1]);
 	int height=width*(My-my)/(Mx-mx);
 
-	const int maxiter=1024;
 
-	vector<COLORTRIPLE> colors(maxiter);
+	vector<RandomColor> colors(maxiter);
 	BITMAP mtx=CreateEmptyBitmap(height,width);
 
-	for_each (colors.begin(), colors.end(), 
-			[](COLORTRIPLE& x){x=newColor(rand()%256,rand()%256,rand()%256);});
-
 	complex<double> c, z;
-	clock_t t_begin=clock();
+	double t_begin = nowSec();
 	for (int i=0; i<height; i++)
 		for (int j=0; j<width; j++)
 		{
@@ -68,8 +84,8 @@ int main(int argc, char **argv)
 			PIXEL(mtx,i,j)=colors[itr];
 		}
 
-	clock_t t_end=clock();
-	cout << "Elapsed time: " << double(t_end-t_begin)/CLOCKS_PER_SEC << endl;	
+	double t_end=nowSec();
+	cout << "Elapsed time: " << t_end-t_begin  << "sec" << endl;
 
 	FILE* fp=fopen("out.bmp","wb");
 	WriteBitmap(mtx,fp);
