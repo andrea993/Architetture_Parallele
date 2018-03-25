@@ -50,12 +50,6 @@ inline double nowSec()
 	return t.tv_sec + t.tv_usec*1e-6;
 }
 
-inline COLORTRIPLE newColor(byte r, byte g, byte b)
-{
-	COLORTRIPLE color = {b, g, r};
-	return color;
-}
-
 inline complex<double> pixel2c(int row, int col, int width, int height)
 {
 	return complex<double> (
