@@ -4,12 +4,12 @@
 #include <algorithm>
 #include <cstdio>
 #include <string>
-#include <ctime>
 
 extern "C"
 {
 #include "bmp.h"
 #include <pthread.h>
+#include <sys/time.h>
 }
 
 using namespace std;
@@ -31,6 +31,14 @@ struct ThreadData
 	BITMAP &mtx;
 	const vector<COLORTRIPLE> &colors;
 };
+
+inline double nowSec()
+{
+	struct timeval t;
+	struct timezone tzp;
+	gettimeofday(&t, &tzp);
+	return t.tv_sec + t.tv_usec*1e-6;
+}
 
 inline COLORTRIPLE newColor(byte r, byte g, byte b)
 {
@@ -84,18 +92,15 @@ int main(int argc, char **argv)
 
 	int N=stoi(argv[2]);
 
-	const int maxiter=1024;
-
 	vector<COLORTRIPLE> colors(maxiter);
 	BITMAP mtx=CreateEmptyBitmap(height,width);
 
 	for_each (colors.begin(), colors.end(), 
 			[](COLORTRIPLE& x){x=newColor(rand()%256,rand()%256,rand()%256);});
-	
+
 	vector<pthread_t> threads(N);
 
-	clock_t t_begin=clock();
-
+	double t_begin = nowSec();
 	for(int i=0; i<N; i++)
 	{
 		int i0=i*height/N;
@@ -104,12 +109,12 @@ int main(int argc, char **argv)
 
 		pthread_create(&threads[i],NULL,parLoop,static_cast<void*>(&d));
 	}
-	
+
 	for_each(threads.begin(), threads.end(),
 			[](pthread_t x){pthread_join(x,NULL);});
 
-	clock_t t_end=clock();
-	cout << "Elapsed time: " << double(t_end-t_begin)/CLOCKS_PER_SEC << endl;	
+	double t_end=nowSec();
+	cout << "Elapsed time: " << t_end-t_begin  << endl;	
 
 	FILE* fp=fopen("out.bmp","wb");
 	WriteBitmap(mtx,fp);
