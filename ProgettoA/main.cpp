@@ -8,7 +8,7 @@
 
 extern "C"
 {
-   #include "bmp.h"
+#include "bmp.h"
 }
 
 using namespace std;
@@ -20,15 +20,15 @@ const double My=1;
 
 inline COLORTRIPLE newColor(byte r, byte g, byte b)
 {
-   COLORTRIPLE color = {b, g, r};
-   return color;
+	COLORTRIPLE color = {b, g, r};
+	return color;
 }
 
 inline complex<double> pixel2c(int row, int col, int width, int height)
 {
-   return complex<double> (
-      col/static_cast<double>(width)*(Mx-mx) + mx, 
-      row/static_cast<double>(height)*(My-my) + my);
+	return complex<double> (
+			col/static_cast<double>(width)*(Mx-mx) + mx, 
+			row/static_cast<double>(height)*(My-my) + my);
 }
 
 int main(int argc, char **argv)

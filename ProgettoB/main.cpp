@@ -8,8 +8,8 @@
 
 extern "C"
 {
-   #include "bmp.h"
-	#include <pthread.h>
+#include "bmp.h"
+#include <pthread.h>
 }
 
 using namespace std;
@@ -29,20 +29,20 @@ struct ThreadData
 	const int idx0;
 	const int idx1;
 	BITMAP &mtx;
-   const vector<COLORTRIPLE> &colors;
+	const vector<COLORTRIPLE> &colors;
 };
 
 inline COLORTRIPLE newColor(byte r, byte g, byte b)
 {
-   COLORTRIPLE color = {b, g, r};
-   return color;
+	COLORTRIPLE color = {b, g, r};
+	return color;
 }
 
 inline complex<double> pixel2c(int row, int col, int width, int height)
 {
-   return complex<double> (
-      col/static_cast<double>(width)*(Mx-mx) + mx, 
-      row/static_cast<double>(height)*(My-my) + my);
+	return complex<double> (
+			col/static_cast<double>(width)*(Mx-mx) + mx, 
+			row/static_cast<double>(height)*(My-my) + my);
 }
 
 void* parLoop(void *arg)
@@ -63,9 +63,9 @@ void* parLoop(void *arg)
 			}
 			PIXEL(data->mtx,i,j)=data->colors[itr];
 		}
-      
-   pthread_exit(NULL);
-   return (void*)0;
+
+	pthread_exit(NULL);
+	return (void*)0;
 }
 
 
@@ -83,7 +83,7 @@ int main(int argc, char **argv)
 	int height=width*(My-my)/(Mx-mx);
 
 	int N=stoi(argv[2]);
-	
+
 	const int maxiter=1024;
 
 	vector<COLORTRIPLE> colors(maxiter);
@@ -96,15 +96,15 @@ int main(int argc, char **argv)
 
 	for(int i=0; i<N; i++)
 	{
-      int i0=i*height/N;
-      int i1=(i+1)*height/N;    
+		int i0=i*height/N;
+		int i1=(i+1)*height/N;    
 		ThreadData d(i0,i1,mtx,colors);
-            
-      pthread_t thread_i;
+
+		pthread_t thread_i;
 		pthread_create(&thread_i,NULL,parLoop,static_cast<void*>(&d));
-      pthread_join(thread_i, NULL);
+		pthread_join(thread_i, NULL);
 	}
-	
+
 	clock_t t_end=clock();
 	cout << "Elapsed time: " << double(t_end-t_begin)/CLOCKS_PER_SEC << endl;	
 
