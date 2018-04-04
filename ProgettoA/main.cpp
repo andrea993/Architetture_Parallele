@@ -76,7 +76,7 @@ int main(int argc, char **argv)
 			c=pixel2c(i,j,width,height);
 			int itr=0;
 			z=0;
-			while (abs(z)<2 && itr<maxiter-1)
+			while (z.real()*z.real()+z.imag()*z.imag()<2*2 && itr<maxiter-1)
 			{
 				z=z*z+c;
 				itr++;		
