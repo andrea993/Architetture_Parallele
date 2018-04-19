@@ -42,7 +42,7 @@ int main()
 	std::cout<< "Using device: "<<default_device.getInfo<CL_DEVICE_NAME>()<<std::endl;
 
 
-	cl::Context context({default_device});
+	cl::Context context(default_device);
 	cl::Program::Sources sources;
 
 	std::string kernel_code(
