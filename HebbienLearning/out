@@ -1,0 +1,25 @@
+In file included from HebbianLearning.cpp:3:0:
+neuron.hpp: In member function ‘float Neuron::Perfactv(float)’:
+neuron.hpp:53:56: error: expected ‘)’ before ‘;’ token
+     return (exp(u/w0)-exp(-u/w0))/(exp(u/w0)+exp(-u/w0);
+                                                        ^
+HebbianLearning.cpp: At global scope:
+HebbianLearning.cpp:5:15: error: ‘u1’ was not declared in this scope
+ float fitness(u1, u2)
+               ^
+HebbianLearning.cpp:5:19: error: ‘u2’ was not declared in this scope
+ float fitness(u1, u2)
+                   ^
+HebbianLearning.cpp:5:21: error: expression list treated as compound expression in initializer [-fpermissive]
+ float fitness(u1, u2)
+                     ^
+HebbianLearning.cpp:6:1: error: expected ‘,’ or ‘;’ before ‘{’ token
+ {
+ ^
+HebbianLearning.cpp: In function ‘int main()’:
+HebbianLearning.cpp:22:56: error: ‘fitness’ cannot be used as a function
+   dataset_y[i]=fitness(dataset_u[i][0], dataset_u[i][1]);
+                                                        ^
+HebbianLearning.cpp:30:41: error: ‘datset_y’ was not declared in this scope
+    if (int(n.Perf(dataset_u[i])) != int(datset_y[i]))
+                                         ^
