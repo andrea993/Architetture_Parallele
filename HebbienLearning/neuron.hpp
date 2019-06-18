@@ -10,41 +10,41 @@ class Neuron
 public:
 	enum class Activation
 	{
-		heaviside,
+		signum,
 		linear,
 		sigmoid,
 		tanh
 	};
 
-	Neuron(unsigned Ninp=0, Activation a=Activation::heaviside) : w(Ninp,1),a(a),w0(0) {}
+	Neuron(unsigned Ninp=0, Activation a=Activation::sigmoid) : w(Ninp,0),w0(-3),a(a) {}
 
 	void setWeight(int i, float w_i) { w[i] = w_i; }
-	float Weigth(int i) const { return w[i]; }
+	float Weight(int i) const { return w[i]; }
 	float W0() const { return w0; }
 	void setW0(float w) { w0=w; };
 	unsigned Ninp() const { return w.size(); }
 
-	float Perf(const std::vector<float> &u)
+	float Perf(const std::vector<float> &u) const
 	{
 		if (u.size() != w.size())
 			throw std::logic_error("wrong size input vector in Perf()");
 
 		float y=0;
-		for (int i=0; i<w.size(); i++)
+		for (int i=0; i<int(w.size()); i++)
 			y+=w[i]*u[i];
 
-		return y*Perfactv(y);
+		return Perfactv(y);
 	}
 
 
 private:
 	
-	float Perfactv(float u)
+	float Perfactv(float u) const
 	{
 		switch(a)
 		{
-			case Activation::heaviside:
-				return (u>w0) ? 1 : 0;
+			case Activation::signum:
+				return (u>w0) ? 1 : -1;
 			case Activation::linear:
 				return u*w0;
 			case Activation::sigmoid:
@@ -53,6 +53,8 @@ private:
 				return (exp(u/w0)-exp(-u/w0))/(exp(u/w0)+exp(-u/w0));
 
 		}
+
+		return 0;
 	}
 	
 	std::vector<float> w;

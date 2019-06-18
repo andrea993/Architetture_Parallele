@@ -2,53 +2,83 @@
 #include <iostream>
 #include "neuron.hpp"
 
-float fitness(float u1, float u2)
+const int NINP = 2;
+const int NSET = 4;
+const float nu = 0.01;
+
+bool trained(const std::vector<std::vector<float>> &data, const Neuron &n)
 {
-	std::cout << int(int(u1) && int(u2)) << std::endl;
-	return int(u1) && int(u2);
-}
-
-int main()
-{
-	Neuron n(2, Neuron::Activation::heaviside);
-
-	bool trained = false;
-
-	float nu=0.5;
-
-	std::vector<std::vector<float>> dataset_u = { {0,0}, {0,1}, {1,0}, {1,1} };
-	std::vector<float> dataset_y(dataset_u.size());
-
-	for (int i=0; i<dataset_u.size(); i++)
-		dataset_y[i]=fitness(dataset_u[i][0], dataset_u[i][1]);
-
-	while (!trained)
+	bool train = true;
+	for (int i=0; i<NSET; i++)
 	{
-		trained = true;
-		for (int i=0; i<n.Ninp(); i++)
+		std::vector<float> u(data[i].begin(),data[i].begin()+NINP);
+		if (n.Perf(u) != data[i].back())
 		{
-			if (int(n.Perf(dataset_u[i])) != int(dataset_y[i]))
-			{
-				trained=false;
-				break;
-			}
-		}
-		if (trained)
+			train = false;
 			break;
-
-		for (int i=0; i<n.Ninp(); i++)
-		{
-			float dw_0 = nu*dataset_u[i][0]*dataset_y[i];
-			float dw_1 = nu*dataset_u[i][1]*dataset_y[i];
-			
-			std::cout<<"dw0:" << dw_0 << " dw1:" <<dw_1 << std::endl;
-
-			n.setWeight(0, n.Weigth(0)+dw_0);
-			n.setWeight(1, n.Weigth(1)+dw_1);
 		}
 	}
+	return train;
+}
 
-	std::cout << "trained" << std::endl;
+int main(int argc, char **argv)
+{
+
+	if(argc != 2)
+	{
+USAGE:
+		std::cerr<<"Usage"<<std::endl<<
+			"hebbianlearning [OR\\AND]"<<std::endl;
+
+		return -1;
+	}
+
+	Neuron n(NINP, Neuron::Activation::signum);
+
+	unsigned itr=0;
+
+	std::vector<std::vector<float>> data_or = {
+		{-1,	-1,	-1},
+		{-1,	 1,	 1},
+		{ 1,	-1,	 1},
+		{ 1,	 1,	 1}}; 
+
+	std::vector<std::vector<float>> data_and = {
+		{-1,	-1,	-1},
+		{-1,	 1,	-1},
+		{ 1,	-1,	-1},
+		{ 1,	 1,	 1}}; 
+
+	std::vector<std::vector<float>> data;
+
+	if ("OR" == std::string(argv[1]))
+	{
+		data = data_or;
+		n.setW0(-3);
+	}
+	else if ("AND" == std::string(argv[1]))
+	{
+		data = data_and;
+		n.setW0(0);
+	}
+	else
+		goto USAGE;
 
 
+	int row = 0;
+	while (!trained(data, n))
+	{
+		for (int i=0; i<NINP; i++)
+		{
+			float dw = nu*data[row][i]*data[row].back();
+			n.setWeight(i, n.Weight(i) + dw);
+		}
+		row = (row + 1) % NSET;	
+		itr++;
+	}
+
+
+	std::cout << "trained in " << itr << " iterations" << std::endl;
+
+	return 0;
 }
