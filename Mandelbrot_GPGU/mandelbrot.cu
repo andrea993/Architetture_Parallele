@@ -16,6 +16,14 @@ typedef struct _mandelbrotPars
 	unsigned maxiter;
 }mandelbrotPars;
 
+double nowSec()
+{
+	struct timeval t;
+	struct timezone tzp;
+	gettimeofday(&t, &tzp);
+	return t.tv_sec + t.tv_usec*1e-6;
+}
+
 __global__ void global_mandelbrot(mandelbrotPars pars)
 {
 	int row = pars.height - blockIdx.y -1;
@@ -63,16 +71,18 @@ int main(int argc, char **argv)
 	pars.width=atoi(argv[1]);
 	pars.height=pars.width*(pars.My-pars.my)/(pars.Mx-pars.mx);
 
-	fprintf(stderr,"%d %d\n",pars.width,pars.height);
-
 	pars.M = CreateEmptyBitmap(pars.height, pars.width);
 	cudaDeviceSynchronize();
 	
 	dim3 blockPerGrid(pars.width, pars.height, 1);
 	dim3 threadPerBlock(1, 1, 1);
 
+	double t_begin = nowSec();
 	global_mandelbrot <<< blockPerGrid, threadPerBlock >>> (pars);
 	cudaDeviceSynchronize();
+	double t_end = nowSec();
+	
+	printf("Elapsed Time: %f sec\n", t_end - t_begin);
 
 	FILE* fp = fopen("out.bmp","wb");
 	WriteBitmap(pars.M, fp);

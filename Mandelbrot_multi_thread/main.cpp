@@ -24,7 +24,7 @@ const int maxiter=1024;
 struct ThreadData
 {
 	ThreadData(int idx0, int idx1, BITMAP &mtx): 
-		idx0(idx0), idx1(idx1), mtx(mtx), colors(colors) {}
+		idx0(idx0), idx1(idx1), mtx(mtx) {}
 
 	const int idx0;
 	const int idx1;
@@ -42,8 +42,8 @@ inline double nowSec()
 inline complex<double> pixel2c(int row, int col, int width, int height)
 {
 	return complex<double> (
-			col/static_cast<double>(width)*(Mx-mx) + mx, 
-			row/static_cast<double>(height)*(My-my) + my);
+			col/static_cast<double>(width-1)*(Mx-mx) + mx, 
+			(height-row-1)/static_cast<double>(height-1)*(My-my) + my);
 }
 
 void* parLoop(void *arg)
@@ -63,8 +63,8 @@ void* parLoop(void *arg)
 				itr++;		
 			}
 			COLORTRIPLE color = {0,0,0};
-			if (itr < pars.maxiter)
-				color.green = color.blue = itr*255/pars.maxiter;
+			if (itr < maxiter)
+				color.green = color.blue = itr*255/maxiter;
 			
 			PIXEL(data->mtx,i,j)=color;
 		}
