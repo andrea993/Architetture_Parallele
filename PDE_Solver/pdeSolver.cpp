@@ -9,7 +9,7 @@ extern "C"
 	#include <sys/time.h>
 }
 
-const float TOLERANCE=1e-4;
+const float TOLERANCE=1e-5;
 const int MAXITER=1024;
 
 inline double nowSec()
@@ -34,10 +34,8 @@ std::ostream& operator<<(std::ostream &os, std::vector< std::vector<float> > &mt
 	return os;
 }
 
-
 int main(int argc, char **argv)
 {
-
 	if (argc != 2)
 	{
 		std::cout<<"Usage:"<<std::endl<<
@@ -68,7 +66,7 @@ int main(int argc, char **argv)
 			for (int j=1; j<N+1; j++)
 			{
 				old=mtx[i][j];
-				mtx[i][j]=0.2*(mtx[i-1][j]+mtx[i+1][j]+mtx[i][j-1]+mtx[i][j+1]);
+				mtx[i][j]=0.25*(mtx[i-1][j]+mtx[i+1][j]+mtx[i][j-1]+mtx[i][j+1]);
 
 				sumdiff+=std::fabs(mtx[i][j]-old);
 			}

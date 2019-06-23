@@ -3,7 +3,7 @@
 #include <math.h>
 #include <sys/time.h>
 
-const int PARTITION_SIZE = 2;
+const int PARTITION_SIZE = 32;
 
 #define AT(mtx, width, row, column)  \
         mtx[(row) * (width) + (column)]
@@ -21,7 +21,7 @@ inline double nowSec()
 __global__ void global_mmul (int *A, int *B, int *C, int N, int Ndev, int dev)
 {
 	int NperDev = N/Ndev;
-	int i = (NperDev)-1 - (blockIdx.y * blockDim.y + threadIdx.y) + NperDev*dev;
+	int i = NperDev*(1+dev) -1 - (blockIdx.y * blockDim.y + threadIdx.y);
 	int j = blockIdx.x * blockDim.x + threadIdx.x;
 	
 	int iAC = i % NperDev;
@@ -78,15 +78,9 @@ int main(int argc, char **argv)
 	int nDevices;
 	cudaGetDeviceCount(&nDevices);
 	
-	if (N % PARTITION_SIZE)
+	if (N % (PARTITION_SIZE*nDevices))
 	{
-		printf ("error: N must be a multiple of %d\n", PARTITION_SIZE);
-		return -1;
-	}
-	
-	if (N % nDevices)
-	{
-		printf ("error: N must be a multiple of nDevices=%d\n", nDevices);
+		printf ("error: N must be a multiple of PARTITION_SIZE*nDevices=%d\n", PARTITION_SIZE*nDevices);
 		return -1;
 	}
 	
@@ -170,14 +164,19 @@ int main(int argc, char **argv)
 
 	for (int i=0; i<nDevices; i++)
 	{
+		free(A_h[i]);
+		free(C_h[i]);
 		cudaFree(A_d[i]);
 		cudaFree(B_d[i]);
 		cudaFree(C_d[i]);
 	}
 	
 	free(A_h);
+	free(A_d);
 	free(B_h);
 	free(B_d);
+	free(C_h);
+	free(C_d);
 	
 	return 0;
 }

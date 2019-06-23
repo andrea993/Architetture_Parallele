@@ -26,8 +26,8 @@ __host__ void host_mmul (int *A, int *B, int *C, int N)
 
 __global__ void global_mmul (int *A, int *B, int *C, int N)
 {
-	int i=threadIdx.y;
-	int j=threadIdx.x;
+	int i=blockIdx.y;
+	int j=blockIdx.x;
 	for (int k=0; k<N; k++)
 	{
 		*(C+ i*N+j)+=*(A+i*N + k) * *(B+k*N+j);
@@ -74,7 +74,7 @@ int main(int argc, char **argv)
 	{
 		for (int j=0; j<N; j++)
 		{
-			*ptrA=i+j;
+			*ptrA=i*N+j;
 			*ptrB=0;
 			if (i==j)
 				*ptrB=1;
@@ -96,8 +96,8 @@ int main(int argc, char **argv)
 	host_mmul(A, B, C_host, N);
 	double t_end_cpu = nowSec();
 
-	dim3 blockPerGrid(1,1);
-	dim3 threadPerBlock(10,10);
+	dim3 blockPerGrid(N,N);
+	dim3 threadPerBlock(1,1);
 
 	double t_begin_gpu = nowSec();
 	global_mmul <<< blockPerGrid, threadPerBlock >>> (A,B,C_device,N);

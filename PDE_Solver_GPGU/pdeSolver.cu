@@ -48,7 +48,7 @@ __global__ void global_cellSolve(float *mtx, int dim, int M, float* itr)
 		if ((i % 2 == 0 && c == red) ||
 			(i % 2 == 1 && c == black))
 		{
-			AT(mtx,M,i,j) = 0.2*(AT(mtx,M,i-1,j)+AT(mtx,M,i+1,j)+AT(mtx,M,i,j-1)+AT(mtx,M,i,j+1));	
+			AT(mtx,M,i,j) = 0.25*(AT(mtx,M,i-1,j)+AT(mtx,M,i+1,j)+AT(mtx,M,i,j-1)+AT(mtx,M,i,j+1));	
 		}
 		
 		c = c == red ? black : red;
@@ -77,7 +77,7 @@ int main(int argc, char **argv)
 	
 	if (N % DIVISOR)
 	{
-		std::cerr << "N deve essere un multiplo di " << DIVISOR <<std::cout;
+		std::cerr << "N deve essere un multiplo di " << DIVISOR <<std::endl;
 		return -1;
 	}
 	
